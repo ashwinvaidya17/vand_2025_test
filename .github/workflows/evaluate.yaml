@@ -55,6 +55,11 @@ jobs:
           # Copy the saved static files to the gh-pages branch
           cp -r /tmp/static/* .
 
+      - name: Clean changes
+        run: |
+          # Remove changes made due to uv sync
+          git clean -fd
+
       - name: Update results
         run: |
           # Create results.csv if it doesn't exist
