@@ -75,7 +75,7 @@ jobs:
           PR_NUMBER="${{ github.event.pull_request.number }}"
           PR_ACTOR="${{ github.actor }}"
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          SCORE=$(cat /tmp/output.json | jq -r '.score')
+          SCORE=$(cat /tmp/output.txt)
 
           # Use printf to properly handle CSV escaping
           printf "%s,%s,%s,%s,%s,%s\n" \
@@ -96,10 +96,10 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const result = JSON.parse(fs.readFileSync('/tmp/output.json', 'utf8'));
+            const result = fs.readFileSync('/tmp/output.txt', 'utf8');
 
             const comment = `## Evaluation Results
-            Score: ${result.score}
+            Score: ${result}
             PR Actor: ${PR_ACTOR}`;
 
             await github.rest.issues.createComment({
