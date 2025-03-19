@@ -6,7 +6,7 @@ on:
 
 jobs:
   evaluate:
-    runs-on: self-hosted
+    runs-on: vand2025-runner
     permissions:
       contents: write
       pull-requests: write

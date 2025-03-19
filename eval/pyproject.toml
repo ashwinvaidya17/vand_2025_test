@@ -6,7 +6,6 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "submission-template",
- "anomalib[core]>=v1.2.0",
 ]
 
 [tool.uv.sources]
