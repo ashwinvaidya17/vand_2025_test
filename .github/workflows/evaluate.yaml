@@ -71,17 +71,24 @@ jobs:
           fi
 
           # Read the evaluation output and append to results.csv
-          PR_NAME=${{ github.event.pull_request.title }}
-          PR_NUMBER=${{ github.event.pull_request.number }}
-          PR_ACTOR=${{ github.actor }}
+          PR_NAME="${{ github.event.pull_request.title }}"
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PR_ACTOR="${{ github.actor }}"
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           SCORE=$(cat /tmp/output.json | jq -r '.score')
 
-          echo "$PR_NAME,$PR_NUMBER,$PR_SHA,$TIMESTAMP,$SCORE,$PR_ACTOR" >> results.csv
+          # Use printf to properly handle CSV escaping
+          printf "%s,%s,%s,%s,%s,%s\n" \
+            "${PR_NAME}" \
+            "${PR_NUMBER}" \
+            "${PR_SHA}" \
+            "${TIMESTAMP}" \
+            "${SCORE}" \
+            "${PR_ACTOR}" >> results.csv
 
           # Commit and push changes
           git add .
-          git commit -m "Add evaluation results for PR $PR_NAME (#$PR_NUMBER) by $PR_ACTOR"
+          git commit -m "Add evaluation results for PR \"${PR_NAME}\" (#${PR_NUMBER}) by ${PR_ACTOR}"
           git push origin gh-pages
 
       - name: Add results comment
