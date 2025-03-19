@@ -1,11 +1,8 @@
-version: "3.8"
-
 services:
   runner-0: # change this to runner-1, runner-2, etc.
     build:
       context: ..
       dockerfile: .platform/DOCKERFILE
-    shm-size: 2G
     deploy:
       resources:
         reservations:
@@ -16,15 +13,16 @@ services:
         limits:
           memory: 142g # 1/7 of the total memory in the server
     mem_limit: 142g
+    shm_size: 2G
     environment:
       - RUNNER_TOKEN=${RUNNER_TOKEN} # Pass GitHub runner token as env variable
       - NVIDIA_VISIBLE_DEVICES=${GPU_ID:-0} # Specify which GPU to use, default to 0
     volumes:
       - ../datasets:/home/user/datasets:ro # Mount datasets as read-only
-    entrypoint: >
-      /bin/bash -c "
+    entrypoint: |
+      /bin/bash -c '
       if [ ! -f /home/user/actions-runner/.credentials ]; then
-        ./actions-runner/config.sh --url https://github.com/vanderschaarlab/vand2025 --token $$RUNNER_TOKEN --unattended
+        ./actions-runner/config.sh --url https://github.com/ashwinvaidya17/vand_2025_test --token $RUNNER_TOKEN --labels vand2025-runner --unattended
       fi
       ./actions-runner/run.sh
-      "
+      '

@@ -5,5 +5,7 @@ __pycache__/
 *.pyw
 *.pyz
 
-.venv/
+**/.venv/
 *.egg-info/
+.env
+datasets
