@@ -100,7 +100,7 @@ jobs:
 
             const comment = `## Evaluation Results
             Score: ${result}
-            PR Actor: ${PR_ACTOR}`;
+            PR Actor: ${{ github.actor }}`;
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,
