@@ -16,6 +16,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run evaluation
+        timeout-minutes: 180 # 3 hours timeout
         run: |
           cd eval
           uv sync
@@ -26,17 +27,21 @@ jobs:
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "actions@github.com"
 
-      - name: Save static files
+      - name: Save static files and SHA
         run: |
           # Create a temporary directory and copy static files
           mkdir -p /tmp/static
           cp -r .platform/static/* /tmp/static/
+          # Save the PR SHA
+          echo $(git rev-parse HEAD) > /tmp/pr_sha
+
+      - name: Clean and stash changes
+        run: |
+          git stash --include-untracked
+          git clean -fd
 
       - name: Checkout gh-pages branch
         run: |
-          # Save the PR SHA to use later
-          PR_SHA=$(git rev-parse HEAD)
-
           # Try to fetch gh-pages branch
           if ! git fetch origin gh-pages; then
             # If branch doesn't exist, create an orphan branch
@@ -55,13 +60,11 @@ jobs:
           # Copy the saved static files to the gh-pages branch
           cp -r /tmp/static/* .
 
-      - name: Clean changes
-        run: |
-          # Remove changes made due to uv sync
-          git clean -fd
-
       - name: Update results
         run: |
+          # Get the saved PR SHA
+          PR_SHA=$(cat /tmp/pr_sha)
+
           # Create results.csv if it doesn't exist
           if [ ! -f results.csv ]; then
             echo "pr_name,pr_number,commit_sha,timestamp,score,pr_actor" > results.csv
