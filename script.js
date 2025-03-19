@@ -29,9 +29,11 @@ async function loadResults() {
                 <thead>
                     <tr>
                         <th>Rank</th>
-                        <th>PR #</th>
+                        <th>Name</th>
+                        <th>Created by</th>
                         <th>Score</th>
                         <th>Timestamp</th>
+                        <th>PR #</th>
                         <th>Commit</th>
                     </tr>
                 </thead>
@@ -39,9 +41,11 @@ async function loadResults() {
                     ${rows.map((row, index) => `
                         <tr>
                             <td>${index + 1}</td>
-                            <td><a href="TODO">#${row.pr_number}</a></td>
+                            <td>${row.pr_name}</td>
+                            <td>${row.pr_actor}</td>
                             <td>${row.score.toFixed(4)}</td>
                             <td>${row.timestamp.toLocaleString()}</td>
+                            <td><a href="TODO">#${row.pr_number}</a></td>
                             <td><a href="TODO">${row.commit_sha.slice(0, 7)}</a></td>
                         </tr>
                     `).join('')}
