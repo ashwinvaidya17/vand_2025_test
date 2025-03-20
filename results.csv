@@ -1,3 +1,0 @@
-pr_name,pr_number,commit_sha,timestamp,score,pr_actor
-Add dummy model,1,e8ce9afd707c6d31312f6f968fd7d7a5eaa2fbee,2025-03-19T14:00:39Z,0.01,ashwinvaidya17
-Model with extra dependency,2,26906b53b1c67e00fdd47c0b17069eebb4576d8b,2025-03-19T14:08:21Z,0.03,ashwinvaidya17
