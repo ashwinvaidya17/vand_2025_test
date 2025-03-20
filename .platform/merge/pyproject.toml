@@ -10,7 +10,7 @@ dependencies = ["pandas"]
 packages = ["src/merge"]
 
 [project.scripts]
-merge = "merge.main:main"
+merge = "merge.main:run"
 
 [build-system]
 requires = ["hatchling"]

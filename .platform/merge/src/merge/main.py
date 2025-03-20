@@ -32,11 +32,16 @@ def main(pr_name: str, pr_number: int, pr_author: str, timestamp: str, pr_sha: s
     df.to_csv("results.csv", index=False)
 
 
-if __name__ == "__main__":
+def run():
     parser = argparse.ArgumentParser()
     parser.add_argument("--pr_name", type=str, required=True)
     parser.add_argument("--pr_number", type=int, required=True)
     parser.add_argument("--pr_author", type=str, required=True)
     parser.add_argument("--timestamp", type=str, required=True)
     parser.add_argument("--pr_sha", type=str, required=True)
-    main()
+    args = parser.parse_args()
+    main(args.pr_name, args.pr_number, args.pr_author, args.timestamp, args.pr_sha)
+
+
+if __name__ == "__main__":
+    run()
