@@ -1,3 +1,6 @@
 class Model:
     def evaluate(self):
-        return 0.03
+        return {
+            "image_score": 0.03,
+            "pixel_score": 0.03,
+        }
