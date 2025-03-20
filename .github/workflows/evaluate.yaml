@@ -112,7 +112,7 @@ jobs:
           PR_NUMBER="${{ github.event.pull_request.number }}"
           PR_CREATOR="${{ github.event.pull_request.user.login }}"
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          uv run merge --pr_name="${PR_NAME}" --pr_number="${PR_NUMBER}" --pr_author="${PR_CREATOR}" --timestamp="${TIMESTAMP}" --pr_sha="${PR_SHA}"
+          merge --pr_name="${PR_NAME}" --pr_number="${PR_NUMBER}" --pr_author="${PR_CREATOR}" --timestamp="${TIMESTAMP}" --pr_sha="${PR_SHA}"
 
           # Copy the merged results.csv back to the gh-pages branch
           cp results.csv /tmp/static/results.csv
