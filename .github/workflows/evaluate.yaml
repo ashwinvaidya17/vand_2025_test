@@ -98,8 +98,8 @@ jobs:
       - name: Merge results
         run: |
           # Copy results.csv to the merge directory if it exists
-          if [ -f /tmp/static/results.csv ]; then
-            cp /tmp/static/results.csv /tmp/merge/results.csv
+          if [ -f results.csv ]; then
+            cp results.csv /tmp/merge/results.csv
           fi
           # Run the merge script
           cd /tmp/merge
@@ -123,6 +123,10 @@ jobs:
       - name: Push New Results
         run: |
           # Commit and push changes
+          PR_NAME="${{ github.event.pull_request.title }}"
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PR_CREATOR="${{ github.event.pull_request.user.login }}"
+
           git add .
-          git commit -m "Add evaluation results for PR \"${PR_NAME}\" (#${PR_NUMBER}) by ${PR_ACTOR}"
+          git commit -m "Add evaluation results for PR \"${PR_NAME}\" (#${PR_NUMBER}) by ${PR_CREATOR}"
           git push origin gh-pages
