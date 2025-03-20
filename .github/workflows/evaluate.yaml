@@ -10,36 +10,72 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-
+      issues: write
     steps:
       - name: Checkout PR code
         uses: actions/checkout@v4
-
       - name: Run evaluation
         timeout-minutes: 180 # 3 hours timeout
         run: |
           cd eval
           uv sync
           uv run eval
+          cd ..
+      - name: Upload evaluation results
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluation-results
+          path: eval/results.json
+          retention-days: 30
+      - name: Add results comment
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const result = JSON.parse(fs.readFileSync('eval/results.json', 'utf8'));
+            let result_string = "";
+            for (const [key, value] of Object.entries(result)) {
+              result_string += `${key}: ${value}\n`;
+            }
+            const comment = `## Evaluation Results
+            ${result_string}
+            Created by: ${{ github.event.pull_request.user.login }}`;
 
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment
+            });
+
+  publish-results:
+    needs: evaluate
+    runs-on: vand2025-runner
+    permissions:
+      contents: write
+      pull-requests: write
+    strategy:
+      max-parallel: 1
+    steps:
+      - name: Checkout PR code
+        uses: actions/checkout@v4
       - name: Configure Git
         run: |
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "actions@github.com"
-
       - name: Save static files and SHA
         run: |
-          # Create a temporary directory and copy static files
+          # Clear temporary directories if they exist
+          rm -rf /tmp/static
+          rm -rf /tmp/merge
+          # Create a temporary directory and copy static files for the leaderboard website
           mkdir -p /tmp/static
           cp -r .platform/static/* /tmp/static/
           # Save the PR SHA
           echo $(git rev-parse HEAD) > /tmp/pr_sha
-
-      - name: Clean and stash changes
-        run: |
-          git stash --include-untracked
-          git clean -fd
-
+          # Save merger code
+          cp -r .platform/merge /tmp/merge
       - name: Checkout gh-pages branch
         run: |
           # Try to fetch gh-pages branch
@@ -54,58 +90,39 @@ jobs:
           else
             git checkout gh-pages
           fi
-
-      - name: Copy Static files
+      - name: Download evaluation results
+        uses: actions/download-artifact@v4
+        with:
+          name: evaluation-results
+          path: /tmp/merge
+      - name: Merge results
         run: |
-          # Copy the saved static files to the gh-pages branch
-          cp -r /tmp/static/* .
+          # Copy results.csv to the merge directory if it exists
+          if [ -f /tmp/static/results.csv ]; then
+            cp /tmp/static/results.csv /tmp/merge/results.csv
+          fi
+          # Run the merge script
+          cd /tmp/merge
+          uv sync
 
-      - name: Update results
-        run: |
           # Get the saved PR SHA
           PR_SHA=$(cat /tmp/pr_sha)
-
-          # Create results.csv if it doesn't exist
-          if [ ! -f results.csv ]; then
-            echo "pr_name,pr_number,commit_sha,timestamp,score,pr_actor" > results.csv
-          fi
-
           # Read the evaluation output and append to results.csv
           PR_NAME="${{ github.event.pull_request.title }}"
           PR_NUMBER="${{ github.event.pull_request.number }}"
-          PR_ACTOR="${{ github.actor }}"
+          PR_CREATOR="${{ github.event.pull_request.user.login }}"
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          SCORE=$(cat /tmp/output.txt)
+          uv run merge --pr_name="${PR_NAME}" --pr_number="${PR_NUMBER}" --pr_author="${PR_CREATOR}" --timestamp="${TIMESTAMP}" --pr_sha="${PR_SHA}"
 
-          # Use printf to properly handle CSV escaping
-          printf "%s,%s,%s,%s,%s,%s\n" \
-            "${PR_NAME}" \
-            "${PR_NUMBER}" \
-            "${PR_SHA}" \
-            "${TIMESTAMP}" \
-            "${SCORE}" \
-            "${PR_ACTOR}" >> results.csv
-
+          # Copy the merged results.csv back to the gh-pages branch
+          cp results.csv /tmp/static/results.csv
+      - name: Copy Static files back to gh-pages
+        run: |
+          # Copy the saved static files to the gh-pages branch
+          cp -r /tmp/static/* .
+      - name: Push New Results
+        run: |
           # Commit and push changes
           git add .
           git commit -m "Add evaluation results for PR \"${PR_NAME}\" (#${PR_NUMBER}) by ${PR_ACTOR}"
           git push origin gh-pages
-
-      - name: Add results comment
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const fs = require('fs');
-            const result = fs.readFileSync('/tmp/output.txt', 'utf8');
-
-            const comment = `## Evaluation Results
-            Score: ${result}
-            Created by: ${{ github.actor }}`;
-
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: comment
-            });
