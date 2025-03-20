@@ -5,7 +5,9 @@ async function loadResults() {
         const csvText = await response.text();
 
         // Parse CSV (skip header row)
-        const header = csvText.split('\n')[0];
+        let header = csvText.split('\n')[0];
+        header = header.replace(/_/g, ' ');
+        header = header.replace(/\b\w/g, char => char.toUpperCase());
         const rows = csvText.split('\n').slice(1).filter(row => row.trim() !== '');
 
         // Create table HTML
