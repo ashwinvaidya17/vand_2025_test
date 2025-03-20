@@ -16,16 +16,16 @@ def main(pr_name: str, pr_number: int, pr_author: str, timestamp: str, pr_sha: s
     results["pr_sha"] = pr_sha
 
     if not Path("results.csv").exists():
-        df = pd.DataFrame(results)
+        df = pd.DataFrame(results, index=[0])
     else:
         df = pd.read_csv("results.csv")
-        # Update the entry which has the same pr_author and pr_number
-        if (df["pr_author"] == pr_author) & (df["pr_number"] == pr_number):
-            df.loc[
-                (df["pr_author"] == pr_author) & (df["pr_number"] == pr_number), :
-            ] = results
+        existing_entry = df.query(
+            f"pr_author == '{pr_author}' and pr_number == {pr_number}"
+        )
+        if existing_entry.empty:
+            df = pd.concat([df, pd.DataFrame([results])], ignore_index=True)
         else:
-            df = pd.concat([df, pd.DataFrame(results)], ignore_index=True)
+            df.loc[existing_entry.index, :] = pd.DataFrame([results])
 
     # Sort by image_score then by pixel_score in descending order
     df = df.sort_values(by=["image_score", "pixel_score"], ascending=False)
