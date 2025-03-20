@@ -67,7 +67,7 @@ jobs:
           # Save the PR SHA
           echo $(git rev-parse HEAD) > /tmp/pr_sha
           # Save merger code
-          # cp -r .platform/merge /tmp/merge TODO
+          cp -r .platform/merge /tmp/merge
       - name: Checkout gh-pages branch
         run: |
           # Try to fetch gh-pages branch
