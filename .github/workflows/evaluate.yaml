@@ -94,7 +94,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: evaluation-results
-          path: /tmp/merge/results.json
+          path: /tmp/merge
       - name: Merge results
         run: |
           # Copy results.csv to the merge directory if it exists
