@@ -7,6 +7,10 @@ on:
 jobs:
   evaluate:
     runs-on: vand2025-runner
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
     steps:
       - name: Checkout PR code
         uses: actions/checkout@v4
@@ -29,7 +33,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
-            const result = fs.readFileSync('eval/results.json', 'utf8');
+            const result = JSON.parse(fs.readFileSync('eval/results.json', 'utf8'));
             let result_string = "";
             for (const [key, value] of Object.entries(result)) {
               result_string += `${key}: ${value}\n`;
