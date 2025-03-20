@@ -1,2 +1,2 @@
 image_score,pixel_score,pr_name,pr_number,pr_author,timestamp,pr_sha
-0.01,0.01,Add dummy model,1,ashwinvaidya17,2025-03-20T14:38:46Z,908c8a2ada309b4a3c1385341b5792656a743725
+0.03,0.03,Model with extra dependency,2,ashwinvaidya17,2025-03-20T14:43:09Z,7707e60361460f864854a82dbee5e2ced9b8c5e1
