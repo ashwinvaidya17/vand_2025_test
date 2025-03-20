@@ -98,8 +98,8 @@ jobs:
       - name: Merge results
         run: |
           # Copy results.csv to the merge directory if it exists
-          if [ -f /tmp/static/results.csv ]; then
-            cp /tmp/static/results.csv /tmp/merge/results.csv
+          if [ -f results.csv ]; then
+            cp results.csv /tmp/merge/results.csv
           fi
           # Run the merge script
           cd /tmp/merge
