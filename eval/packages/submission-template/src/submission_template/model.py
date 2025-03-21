@@ -38,6 +38,6 @@ class Model(nn.Module):
         # TODO: Implement the forward pass of the model.
         return ImageBatch(
             image=image,
-            pred_score=torch.zeros(image.shape[0]),
-            anomaly_map=torch.zeros(1, *image.shape[2:]),
+            pred_score=torch.randn(image.shape[0]),
+            anomaly_map=torch.randn(1, *image.shape[2:]),
         )
