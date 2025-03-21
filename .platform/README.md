@@ -14,7 +14,7 @@ docker run --gpus gpu_id --shm-size 2G --memory 142g \
 
 ## Configure the runner in detached mode
 ```
-docker exec -it vand2025-runner-container-<id> /bin/bash -c '
+docker exec -it -d vand2025-runner-container-<id> /bin/bash -c '
 if [ ! -f /home/user/actions-runner/.credentials ]; then
     ./actions-runner/config.sh --url https://github.com/ashwinvaidya17/vand_2025_test --token $RUNNER_TOKEN --labels vand2025-runner --unattended
 fi

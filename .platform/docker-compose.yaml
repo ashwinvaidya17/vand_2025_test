@@ -17,8 +17,11 @@ services:
     environment:
       - RUNNER_TOKEN=${RUNNER_TOKEN} # Pass GitHub runner token as env variable
       - NVIDIA_VISIBLE_DEVICES=${GPU_ID:-0} # Specify which GPU to use, default to 0
+      - HTTP_PROXY=${http_proxy:-}
+      - HTTPS_PROXY=${https_proxy:-}
+      - NO_PROXY=${no_proxy:-}
     volumes:
-      - ../datasets:/home/user/datasets:ro # Mount datasets as read-only
+      - /mnt/data/datasets/datasets/:/home/user/datasets:ro # Mount datasets as read-only
     entrypoint: |
       /bin/bash -c '
       if [ ! -f /home/user/actions-runner/.credentials ]; then
